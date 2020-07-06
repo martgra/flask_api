@@ -1,4 +1,7 @@
 import json
+import tempfile
+import os
+from pathlib import PurePath
 
 import pytest
 from dotenv import load_dotenv
@@ -15,9 +18,15 @@ register(UserFactory)
 
 @pytest.fixture
 def app():
-    app = create_app(testing=False)
-    return app
+    db_fd, db_path = tempfile.mkstemp()
 
+    app = create_app(test_config={
+        "TESTING": True, 
+        "SQLALCHEMY_DATABASE_URI": "sqlite:////" + db_path})
+    yield app
+
+    os.close(db_fd)
+    os.unlink(db_path)
 
 @pytest.fixture
 def db(app):

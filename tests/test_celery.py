@@ -11,11 +11,8 @@ def celery_app(celery_app, app):
     os.environ.setdefault('FORKED_BY_MULTIPROCESSING', '1')
     
     celery = init_celery(app)
-
     celery_app.conf = celery.conf
-    print(celery.conf)
     celery_app.Task = celery_app.Task
-    print("HERE")
     yield celery_app
 
 
@@ -23,8 +20,7 @@ def celery_app(celery_app, app):
 def celery_worker_pool():
     return "prefork"
 
-
-def test_example(celery_app, celery_worker_pool):
+def test_example(celery_app, celery_worker, celery_worker_pool):
     """Simply test our dummy task using celery"""
     print("HERE")
     res = dummy_task.delay()
