@@ -13,3 +13,8 @@ apispec-webframeworks
 tox
 celery[redis]
 gunicorn
+pytest 
+pytest-runner 
+pytest-flask 
+pytest-factoryboy 
+factory_boy

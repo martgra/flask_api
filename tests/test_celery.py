@@ -13,14 +13,14 @@ def celery_app(celery_app, app):
     celery = init_celery(app)
     celery_app.conf = celery.conf
     celery_app.Task = celery_app.Task
+    celery_app.conf["task_always_eager"] = True
     yield celery_app
-
 
 @pytest.fixture(scope="session")
 def celery_worker_pool():
     return "prefork"
 
-def test_example(celery_app, celery_worker, celery_worker_pool):
+def test_example(celery_app, celery_worker_pool):
     """Simply test our dummy task using celery"""
     print("HERE")
     res = dummy_task.delay()
