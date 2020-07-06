@@ -25,3 +25,11 @@ repos:
     hooks:
       - id: prettier
         args: [--prose-wrap=always, --print-width=88]
+  - repo: local
+    hooks:
+      - id: pylint
+        name: pylint
+        entry: pylint
+        language: system
+        types: [python]
+        additional_dependencies: ["-r requirements.txt"]
