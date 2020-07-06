@@ -19,3 +19,4 @@ pytest-flask
 pytest-factoryboy 
 factory_boy
 tensorflow
+pytest-cov
