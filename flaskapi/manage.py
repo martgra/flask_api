@@ -1,10 +1,13 @@
+"""CLI module"""
+
 import click
 from flask.cli import FlaskGroup
 
 from flaskapi.app import create_app
 
 
-def create_flaskapi(info):
+def create_flaskapi():
+    """Returns cli version of"""
     return create_app(cli=True)
 
 

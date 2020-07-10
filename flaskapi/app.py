@@ -1,5 +1,5 @@
+"""Initializing flask app and extensions"""
 from pathlib import PurePath, Path
-import os
 
 from flask import Flask
 
@@ -12,14 +12,16 @@ def create_app(test_config=None, cli=True):
     """
     app = Flask("__name__", instance_relative_config=True)
 
+
+
     app.config.from_mapping(
         SECRET_KEY='dev',
-        SQLALCHEMY_DATABASE_URI="sqlite:////"+str(PurePath(app.instance_path,'flaskapi.sqlite')),
-        SQLALCHEMY_TRACK_MODIFICATIONS = False,
-        JWT_BLACKLIST_ENABLED = True,
-        JWT_BLACKLIST_TOKEN_CHECKS = ["access", "refresh"],
-        CELERY_BROKER_URL = 'redis://localhost:6379/0',
-        CELERY_RESULT_BACKEND = 'redis://localhost:6379/1'
+        SQLALCHEMY_DATABASE_URI="sqlite:////"+str(PurePath(app.instance_path, 'flaskapi.sqlite')),
+        SQLALCHEMY_TRACK_MODIFICATIONS=False,
+        JWT_BLACKLIST_ENABLED=True,
+        JWT_BLACKLIST_TOKEN_CHECKS=["access", "refresh"],
+        CELERY_BROKER_URL='redis://localhost:6379/0',
+        CELERY_RESULT_BACKEND='redis://localhost:6379/1'
     )
 
     try:
@@ -34,7 +36,7 @@ def create_app(test_config=None, cli=True):
         # load the test config if passed in
         app.config.from_mapping(test_config)
 
- 
+
 
     configure_extensions(app, cli)
     configure_apispec(app)
@@ -82,6 +84,7 @@ def register_blueprints(app):
 
 
 def init_celery(app=None):
+    """Initialize Celery extension"""
     app = app or create_app()
     celery.conf.broker_url = app.config["CELERY_BROKER_URL"]
     celery.conf.result_backend = app.config["CELERY_RESULT_BACKEND"]
