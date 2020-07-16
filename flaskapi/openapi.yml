@@ -37,6 +37,7 @@ paths:
           schema:
             type: string
     put:
+      summary: Update user
       operationId: flaskapi.api.resources.user.update_user
       tags:
         - User
@@ -58,6 +59,7 @@ paths:
               schema:
                 type: string
     delete:
+      summary: Delete user
       operationId: flaskapi.api.resources.user.delete_user
       tags:
         - User

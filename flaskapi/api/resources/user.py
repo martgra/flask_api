@@ -43,6 +43,7 @@ def update_user(body, user_id=None):
 
 
 def delete_user(user_id):
-        user = User.query.get_or_404(user_id)
-        db.session.delete(user)
-        db.session.commit()
+    user = User.query.get_or_404(user_id)
+    db.session.delete(user)
+    db.session.commit()
+    return {"message": "user deleted"}
