@@ -1,0 +1,138 @@
+openapi: 3.0.0
+info:
+  title: API Key Example
+  version: '1.0'
+paths:
+  /secret:
+    get:
+      summary: Return secret string
+      operationId: flaskapi.api.resources.user.get_secret
+      tags:
+        - User
+      responses:
+        '200':
+          description: secret response
+          content:
+            '*/*':
+              schema:
+                type: string
+      security:
+        - api_key: []
+  '/user/{user_id}':
+    get:
+      summary: Return user
+      operationId: flaskapi.api.resources.user.get_user
+      tags:
+        - User
+      responses:
+        '200':
+          description: user info
+          content:
+            '*/*':
+              schema:
+                type: string
+      parameters:
+        - name: user_id
+          in: path
+          schema:
+            type: string
+    put:
+      operationId: flaskapi.api.resources.user.update_user
+      tags:
+        - User
+      parameters:
+        - in: path
+          name: user_id
+          schema:
+            type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/User"
+      responses:
+        200:
+          description: user info
+          content:
+            '*/*':
+              schema:
+                type: string
+    delete:
+      operationId: flaskapi.api.resources.user.delete_user
+      tags:
+        - User
+      parameters:
+        - in: path
+          name: user_id
+          schema:
+            type: integer
+      responses:
+        200:
+          description: delete user
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: user deleted
+        404:
+          description: user does not exists
+  
+  /user:
+    get:
+      summary: Return all users
+      operationId: flaskapi.api.resources.user.get_users
+      tags:
+        - User
+      responses:
+        '200':
+          description: all registered users
+          content:
+            'application/json':
+              schema:
+                type: object
+                properties:
+                  results:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/User'
+    post:
+      summary: Create user
+      operationId: flaskapi.api.resources.user.create_user
+      tags:
+        - User
+      requestBody:
+        description: Create user
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/User"
+      responses:
+        201:
+          description: Sucessfully created user
+          content:
+            text/plain:
+              schema:
+                type: string
+
+components:
+  securitySchemes:
+    api_key:
+      type: apiKey
+      name: X-Auth
+      in: header
+      x-apikeyInfoFunc: flaskapi.auth.api_key.auth
+  schemas:
+    User:
+      properties:
+        username:
+          type: string
+          example: "123"
+        email:
+          type: string
+          example: user@user.com
+        password:
+          type: string
+          example: "123"

@@ -2,6 +2,8 @@ from pathlib import PurePath, Path
 import os
 
 from flask import Flask
+import connexion
+from json import JSONEncoder
 
 from flaskapi import auth, api
 from flaskapi.extensions import db, jwt, migrate, apispec, celery
@@ -11,10 +13,18 @@ def create_app(test_config=None, cli=True):
     """Application factory, used to create application
     """
     app = Flask("__name__", instance_relative_config=True)
+    app = connexion.FlaskApp(__name__, specification_dir='./')
+    app.json_encoder = JSONEncoder
 
-    app.config.from_mapping(
+    # add connexion file to API
+    app.add_api('openapi.yml')
+
+    # sets path to instance config to relative to the instance folder.
+    app.app.instance_relative_config = True
+
+    app.app.config.from_mapping(
         SECRET_KEY='dev',
-        SQLALCHEMY_DATABASE_URI="sqlite:////"+str(PurePath(app.instance_path,'flaskapi.sqlite')),
+        SQLALCHEMY_DATABASE_URI="sqlite:////"+str(PurePath(app.app.instance_path,'flaskapi.sqlite')),
         SQLALCHEMY_TRACK_MODIFICATIONS = False,
         JWT_BLACKLIST_ENABLED = True,
         JWT_BLACKLIST_TOKEN_CHECKS = ["access", "refresh"],
@@ -23,25 +33,24 @@ def create_app(test_config=None, cli=True):
     )
 
     try:
-        Path(app.instance_path).mkdir(parents=True)
+        Path(app.app.instance_path).mkdir(parents=True)
     except OSError:
         pass
 
     if test_config is None:
         # load the instance config, if it exists, when not testing
-        app.config.from_pyfile('config.py', silent=True)
+        app.app.config.from_pyfile('config.py', silent=True)
     else:
         # load the test config if passed in
-        app.config.from_mapping(test_config)
+        app.app.config.from_mapping(test_config)
 
  
 
-    configure_extensions(app, cli)
-    configure_apispec(app)
-    register_blueprints(app)
-    init_celery(app)
+    configure_extensions(app.app, cli)
+    configure_apispec(app.app)
+    init_celery(app.app)
 
-    return app
+    return app.app
 
 
 def configure_extensions(app, cli):

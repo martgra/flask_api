@@ -1,159 +1,48 @@
-from flask import request
-from flask_restful import Resource
-from flask_jwt_extended import jwt_required
+from functools import partial
 from flaskapi.api.schemas import UserSchema
 from flaskapi.models import User
 from flaskapi.extensions import db
+from flask import request
 from flaskapi.commons.pagination import paginate
 
 
-class UserResource(Resource):
-    """Single object resource
+def get_secret(user) -> str:
+    return "You are {user} and the secret is 'wbevuec'".format(user=user)
 
-    ---
-    get:
-      tags:
-        - api
-      parameters:
-        - in: path
-          name: user_id
-          schema:
-            type: integer
-      responses:
-        200:
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  user: UserSchema
-        404:
-          description: user does not exists
-    put:
-      tags:
-        - api
-      parameters:
-        - in: path
-          name: user_id
-          schema:
-            type: integer
-      requestBody:
-        content:
-          application/json:
-            schema:
-              UserSchema
-      responses:
-        200:
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  msg:
-                    type: string
-                    example: user updated
-                  user: UserSchema
-        404:
-          description: user does not exists
-    delete:
-      tags:
-        - api
-      parameters:
-        - in: path
-          name: user_id
-          schema:
-            type: integer
-      responses:
-        200:
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  msg:
-                    type: string
-                    example: user deleted
-        404:
-          description: user does not exists
-    """
 
-    method_decorators = [jwt_required]
+def get_user(user_id) -> str:
+    schema = UserSchema()
+    user = User.query.get_or_404(user_id)
+    return {"user": schema.dump(user)}
 
-    def get(self, user_id):
-        schema = UserSchema()
-        user = User.query.get_or_404(user_id)
-        return {"user": schema.dump(user)}
 
-    def put(self, user_id):
-        schema = UserSchema(partial=True)
-        user = User.query.get_or_404(user_id)
-        user = schema.load(request.json, instance=user)
+def create_user(body):
+    print(body)
+    data = request.json
+    schema = UserSchema()
+    user = schema.load(data)
 
-        db.session.commit()
+    db.session.add(user)
+    db.session.commit()
 
-        return {"msg": "user updated", "user": schema.dump(user)}
+    return {"msg": "user created", "user": schema.dump(user)}, 201
 
-    def delete(self, user_id):
+
+def get_users():
+    schema = UserSchema(many=True)
+    query = User.query
+    return schema.dump(query)
+
+
+def update_user(body, user_id=None):
+    schema = UserSchema(partial=True)
+    user = User.query.get_or_404(user_id)
+    user = schema.load(request.json, instance=user)
+    db.session.commit()
+    return {"msg": "user updated", "user": schema.dump(user)}
+
+
+def delete_user(user_id):
         user = User.query.get_or_404(user_id)
         db.session.delete(user)
         db.session.commit()
-
-        return {"msg": "user deleted"}
-
-
-class UserList(Resource):
-    """Creation and get_all
-
-    ---
-    get:
-      tags:
-        - api
-      responses:
-        200:
-          content:
-            application/json:
-              schema:
-                allOf:
-                  - $ref: '#/components/schemas/PaginatedResult'
-                  - type: object
-                    properties:
-                      results:
-                        type: array
-                        items:
-                          $ref: '#/components/schemas/UserSchema'
-    post:
-      tags:
-        - api
-      requestBody:
-        content:
-          application/json:
-            schema:
-              UserSchema
-      responses:
-        201:
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  msg:
-                    type: string
-                    example: user created
-                  user: UserSchema
-    """
-
-    method_decorators = [jwt_required]
-
-    def get(self):
-        schema = UserSchema(many=True)
-        query = User.query
-        return paginate(query, schema)
-
-    def post(self):
-        schema = UserSchema()
-        user = schema.load(request.json)
-
-        db.session.add(user)
-        db.session.commit()
-
-        return {"msg": "user created", "user": schema.dump(user)}, 201
