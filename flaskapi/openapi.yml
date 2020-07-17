@@ -165,14 +165,18 @@ components:
       type: object
       properties:
         username:
+          description: Unique user name for user
           type: string
           example: "123"
         email:
+          description: Unique email for user
           type: string
           example: user@user.com
         password:
+          description: Requested password
           type: string
-          example: "123"
+          minLength: 8
+          example: "12345678"
   parameters:
     UserID:
       name: user_id
