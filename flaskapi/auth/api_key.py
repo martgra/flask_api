@@ -10,6 +10,5 @@ def auth(token, required_scopes):
 
     if not info:
         raise OAuthProblem('Invalid token')
-
     return info
 
