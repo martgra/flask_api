@@ -6,7 +6,7 @@ import connexion
 from json import JSONEncoder
 
 from flaskapi import auth, api
-from flaskapi.extensions import db, jwt, migrate, apispec, celery
+from flaskapi.extensions import db, jwt, migrate, celery
 
 
 def create_app(test_config=None, cli=True):
@@ -47,7 +47,6 @@ def create_app(test_config=None, cli=True):
  
 
     configure_extensions(app.app, cli)
-    configure_apispec(app.app)
     init_celery(app.app)
 
     return app.app
@@ -61,33 +60,6 @@ def configure_extensions(app, cli):
 
     if cli is True:
         migrate.init_app(app, db)
-
-
-def configure_apispec(app):
-    """Configure APISpec for swagger support
-    """
-    apispec.init_app(app, security=[{"jwt": []}])
-    apispec.spec.components.security_scheme(
-        "jwt", {"type": "http", "scheme": "bearer", "bearerFormat": "JWT"}
-    )
-    apispec.spec.components.schema(
-        "PaginatedResult",
-        {
-            "properties": {
-                "total": {"type": "integer"},
-                "pages": {"type": "integer"},
-                "next": {"type": "string"},
-                "prev": {"type": "string"},
-            }
-        },
-    )
-
-
-def register_blueprints(app):
-    """register all blueprints for application
-    """
-    app.register_blueprint(auth.views.blueprint)
-    app.register_blueprint(api.views.blueprint)
 
 
 def init_celery(app=None):

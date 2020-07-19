@@ -3,7 +3,6 @@ from flaskapi.api.schemas import UserSchema
 from flaskapi.models import User
 from flaskapi.extensions import db
 from flask import request
-from flaskapi.commons.pagination import paginate
 from sqlalchemy.exc import IntegrityError
 
 

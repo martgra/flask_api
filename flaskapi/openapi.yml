@@ -129,7 +129,14 @@ paths:
         content:
           application/json:
             schema:
-              $ref: "#/components/schemas/User"
+              allOf:
+              # Using allOf to inherit User and add custom requirements
+                - $ref: "#/components/schemas/User"
+                - type: object
+                - required:
+                  - username
+                  - email
+                  - password
       responses:
         201:
           description: Sucessfully created user
