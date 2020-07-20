@@ -13,23 +13,24 @@ def create_app(test_config=None, cli=True):
     """Application factory, used to create application
     """
     app = Flask("__name__", instance_relative_config=True)
-    app = connexion.FlaskApp(__name__, specification_dir='./')
+    app = connexion.FlaskApp(__name__, specification_dir="./")
     app.json_encoder = JSONEncoder
 
     # add connexion file to API
-    app.add_api('openapi.yml')
+    app.add_api("openapi.yml")
 
     # sets path to instance config to relative to the instance folder.
     app.app.instance_relative_config = True
 
     app.app.config.from_mapping(
-        SECRET_KEY='dev',
-        SQLALCHEMY_DATABASE_URI="sqlite:////"+str(PurePath(app.app.instance_path,'flaskapi.sqlite')),
-        SQLALCHEMY_TRACK_MODIFICATIONS = False,
-        JWT_BLACKLIST_ENABLED = True,
-        JWT_BLACKLIST_TOKEN_CHECKS = ["access", "refresh"],
-        CELERY_BROKER_URL = 'redis://localhost:6379/0',
-        CELERY_RESULT_BACKEND = 'redis://localhost:6379/1'
+        SECRET_KEY="dev",
+        SQLALCHEMY_DATABASE_URI="sqlite:////"
+        + str(PurePath(app.app.instance_path, "flaskapi.sqlite")),
+        SQLALCHEMY_TRACK_MODIFICATIONS=False,
+        JWT_BLACKLIST_ENABLED=True,
+        JWT_BLACKLIST_TOKEN_CHECKS=["access", "refresh"],
+        CELERY_BROKER_URL="redis://localhost:6379/0",
+        CELERY_RESULT_BACKEND="redis://localhost:6379/1",
     )
 
     try:
@@ -39,12 +40,10 @@ def create_app(test_config=None, cli=True):
 
     if test_config is None:
         # load the instance config, if it exists, when not testing
-        app.app.config.from_pyfile('config.py', silent=True)
+        app.app.config.from_pyfile("config.py", silent=True)
     else:
         # load the test config if passed in
         app.app.config.from_mapping(test_config)
-
-
 
     configure_extensions(app.app, cli)
     init_celery(app.app)

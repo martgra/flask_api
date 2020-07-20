@@ -12,21 +12,26 @@ from flaskapi.extensions import db as _db
 from flaskapi.models import User
 from tests.factories import UserFactory
 
-load_dotenv('.flaskenv')
+load_dotenv(".flaskenv")
 
 register(UserFactory)
+
 
 @pytest.fixture
 def app():
     db_fd, db_path = tempfile.mkstemp()
 
-    app = create_app(test_config={
-        "TESTING": True, 
-        "SQLALCHEMY_DATABASE_URI": "sqlite:////" + db_path})
+    app = create_app(
+        test_config={
+            "TESTING": True,
+            "SQLALCHEMY_DATABASE_URI": "sqlite:////" + db_path,
+        }
+    )
     yield app
 
     os.close(db_fd)
     os.unlink(db_path)
+
 
 @pytest.fixture
 def db(app):
@@ -44,14 +49,9 @@ def db(app):
 
 @pytest.fixture
 def admin_user(db):
-    user = User(
-        username='admin',
-        email='admin@admin.com',
-        password='admin'
-    )
+    user = User(username="admin", email="admin@admin.com", password="admin")
 
     db.session.add(user)
     db.session.commit()
 
     return user
-

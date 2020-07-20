@@ -32,6 +32,7 @@ def create_user(body):
         # If UNIQUE constraint is violated - return message pointing to conflict
         return {"message": "{} already exist".format(str(e.orig).split(".")[1])}, 409
 
+
 def get_users():
     """Return a list of all users"""
     schema = UserSchema(many=True)

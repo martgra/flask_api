@@ -57,6 +57,7 @@ def test_delete_user(client, db, user):
     data = rep.get_json()
     assert data["message"] == "user deleted"
 
+
 def test_create_user(client, db):
     # test bad data
     data = {"username": "created"}
