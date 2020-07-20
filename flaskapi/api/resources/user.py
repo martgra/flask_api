@@ -1,9 +1,10 @@
-from functools import partial
-from flaskapi.api.schemas import UserSchema
-from flaskapi.models import User
-from flaskapi.extensions import db
+"""API routes for User"""
 from flask import request
 from sqlalchemy.exc import IntegrityError
+
+from flaskapi.api.schemas import UserSchema
+from flaskapi.extensions import db
+from flaskapi.models import User
 
 
 def get_secret(user) -> str:
@@ -28,9 +29,9 @@ def create_user(body):
         db.session.add(user)
         db.session.commit()
         return {"message": "user created", "user": schema.dump(user)}, 201
-    except IntegrityError as e:
+    except IntegrityError as error:
         # If UNIQUE constraint is violated - return message pointing to conflict
-        return {"message": "{} already exist".format(str(e.orig).split(".")[1])}, 409
+        return {"message": "{} already exist".format(str(error.orig).split(".")[1])}, 409
 
 
 def get_users():
@@ -44,7 +45,7 @@ def update_user(body, user_id=None):
     """Update specific user"""
     schema = UserSchema(partial=True)
     user = User.query.get_or_404(user_id)
-    user = schema.load(request.json, instance=user)
+    user = schema.load(body, instance=user)
     db.session.commit()
     return {"message": "user updated", "user": schema.dump(user)}
 

@@ -1,12 +1,11 @@
 """Initializing flask app and extensions"""
-from pathlib import PurePath, Path
-
-from flask import Flask
-import connexion
 from json import JSONEncoder
+from pathlib import Path, PurePath
 
-from flaskapi import auth, api
-from flaskapi.extensions import db, jwt, migrate, celery
+import connexion
+from flask import Flask
+
+from flaskapi.extensions import celery, db, jwt, migrate
 
 
 def create_app(test_config=None, cli=True):

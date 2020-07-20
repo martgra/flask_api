@@ -1,3 +1,4 @@
+"""Init the schemas"""
 from flaskapi.api.schemas.user import UserSchema
 
 

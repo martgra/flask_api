@@ -16,7 +16,6 @@ https://github.com/vimalloc/flask-jwt-extended/blob/master/examples/database_bla
 """
 from flaskapi.extensions import db
 
-
 class TokenBlacklist(db.Model):
     """Blacklist representation
     """
@@ -31,6 +30,7 @@ class TokenBlacklist(db.Model):
     user = db.relationship("User", lazy="joined")
 
     def to_dict(self):
+        """return a dict of properties"""
         return {
             "token_id": self.id,
             "jti": self.jti,

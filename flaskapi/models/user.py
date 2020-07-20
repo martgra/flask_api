@@ -1,3 +1,4 @@
+"""Database model of user"""
 from flaskapi.extensions import db, pwd_context
 
 
