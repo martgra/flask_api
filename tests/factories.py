@@ -6,7 +6,7 @@ class UserFactory(factory.Factory):
 
     username = factory.Sequence(lambda n: "user%d" % n)
     email = factory.Sequence(lambda n: "user%d@mail.com" % n)
-    password = "mypwd"
+    password = "mypwd123"
 
     class Meta:
         model = User

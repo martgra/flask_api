@@ -1,0 +1,198 @@
+# defined as per 
+# https://github.com/OAI/OpenAPI-Specification/blob/master/versions/3.0.0.md#definitions
+openapi: 3.0.1
+info:
+  title: flaskapi boilerplate
+  description: A sample flask RESTful boilerplate using connexion
+  contact:
+    name: Martin Gran
+    url: www.github.com/martgra/flaskapi
+    email: martgra@gmail.com
+  license:
+    name: Apache 2.0 
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  version: '1.1'
+paths:
+  /secret:
+    get:
+      summary: Return secret string
+      operationId: flaskapi.api.resources.user.get_secret
+      tags:
+        - User
+      responses:
+        200:
+          description: secret response
+          content:
+            'text/plain':
+              schema:
+                type: string
+                example: "You are {user} and the secret is 'wbevuec'"
+      security:
+        - api_key: []
+  /user/{user_id}:
+    get:
+      summary: Return user
+      operationId: flaskapi.api.resources.user.get_user
+      tags:
+        - User
+      parameters:
+        - $ref: "#/components/parameters/UserID"
+      responses:
+        200:
+          description: user info of one user
+          content:
+            'application/json':
+              schema:
+                type: object
+                properties:
+                  user:
+                    $ref: "#/components/schemas/User"
+        404:
+          description: user does not exists
+
+    put:
+      summary: Update user
+      operationId: flaskapi.api.resources.user.update_user
+      tags:
+        - User
+      parameters:
+        - $ref: "#/components/parameters/UserID"
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/User"
+      responses:
+        200:
+          description: Updated user info
+          content:
+            'application/json':
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: user updated
+                  user:
+                    $ref: "#/components/schemas/User"
+        404:
+          description: user does not exists
+    delete:
+      summary: Delete user
+      operationId: flaskapi.api.resources.user.delete_user
+      tags:
+        - User
+      parameters:
+        - $ref: "#/components/parameters/UserID"
+      responses:
+        200:
+          description: User deleted confirmation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: user deleted
+        404:
+          description: user does not exists
+  
+  /user:
+    get:
+      summary: Return all users
+      operationId: flaskapi.api.resources.user.get_users
+      tags:
+        - User
+      responses:
+        200:
+          description: All registered users
+          content:
+            'application/json':
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: List of users
+                  users:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/User'
+    post:
+      summary: Create user
+      operationId: flaskapi.api.resources.user.create_user
+      tags:
+        - User
+      requestBody:
+        description: Create user
+        content:
+          application/json:
+            schema:
+              allOf:
+              # Using allOf to inherit User and add custom requirements
+                - $ref: "#/components/schemas/User"
+                - type: object
+                - required:
+                  - username
+                  - email
+                  - password
+      responses:
+        201:
+          description: Sucessfully created user
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message: 
+                    type: string
+                    example: user created
+                  user:
+                    $ref: "#/components/schemas/User"
+        409:
+          description: User with identical username of email details already exists
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: username already exist
+components:
+  securitySchemes:
+    api_key:
+      type: apiKey
+      name: X-Auth
+      in: header
+      x-apikeyInfoFunc: flaskapi.auth.api_key.auth
+  schemas:
+    User:
+      type: object
+      properties:
+        username:
+          description: Unique user name for user
+          type: string
+          example: "123"
+        email:
+          description: Unique email for user
+          type: string
+          example: user@user.com
+        password:
+          description: Requested password
+          type: string
+          minLength: 8
+          example: "12345678"
+  parameters:
+    UserID:
+      name: user_id
+      in: path
+      description: Unique identifier of user
+      required: true
+      schema:
+        type: integer
+        example: 1
+servers:
+# Currently not supported with Connexion. Issue https://github.com/zalando/connexion/issues/1139
+  - url: http://localhost:5000/
